@@ -56,6 +56,15 @@ export function saveGeneratedBanner(banner: GeneratedBanner): void {
   setItem(BANNERS_KEY, banners.slice(0, 100));
 }
 
+export function deleteGeneratedBanner(id: string): void {
+  const banners = getGeneratedBanners().filter((b) => b.id !== id);
+  setItem(BANNERS_KEY, banners);
+}
+
+export function clearGeneratedBanners(): void {
+  setItem(BANNERS_KEY, []);
+}
+
 // Presets
 export function getPresets(templateId?: string): Preset[] {
   const all = getItem<Preset>(PRESETS_KEY);
