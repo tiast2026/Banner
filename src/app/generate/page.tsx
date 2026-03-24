@@ -56,12 +56,24 @@ function GeneratePageInner() {
     if (!captureRef.current || !template) return;
     setGenerating(true);
     try {
+      // Ensure all font weights are fully loaded before capture
       await document.fonts.ready;
+      await Promise.all([
+        document.fonts.load("400 16px 'Noto Sans JP'"),
+        document.fonts.load("700 16px 'Noto Sans JP'"),
+        document.fonts.load("900 16px 'Noto Sans JP'"),
+      ]);
+      // Force a repaint to ensure fonts are applied
+      if (captureRef.current) {
+        captureRef.current.style.visibility = "visible";
+        captureRef.current.offsetHeight; // force reflow
+      }
+      await new Promise((r) => setTimeout(r, 200));
       const { default: html2canvas } = await import("html2canvas-pro");
       const canvas = await html2canvas(captureRef.current!, {
         width: template.width,
         height: template.height,
-        scale: 2,
+        scale: 1,
         useCORS: true,
         backgroundColor: null,
       });
@@ -311,7 +323,6 @@ function GeneratePageInner() {
                   left: "-9999px",
                   top: 0,
                   pointerEvents: "none",
-                  opacity: 0,
                 }}
               >
                 <BannerPreview

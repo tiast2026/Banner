@@ -123,9 +123,10 @@ export default function BatchPage() {
 
       // Render banner off-screen
       const container = document.createElement("div");
-      container.style.position = "absolute";
+      container.style.position = "fixed";
       container.style.left = "-9999px";
-      container.style.top = "-9999px";
+      container.style.top = "0";
+      container.style.pointerEvents = "none";
       document.body.appendChild(container);
 
       // Create React root and render
@@ -136,16 +137,25 @@ export default function BatchPage() {
         root.render(
           <BannerPreview template={template} values={values} />
         );
-        // Wait for render + image load
+        // Wait for render + image/font load
         setTimeout(resolve, 500);
       });
+
+      // Ensure fonts are loaded
+      await document.fonts.ready;
+      await Promise.all([
+        document.fonts.load("400 16px 'Noto Sans JP'"),
+        document.fonts.load("700 16px 'Noto Sans JP'"),
+        document.fonts.load("900 16px 'Noto Sans JP'"),
+      ]);
+      await new Promise((r) => setTimeout(r, 200));
 
       try {
         const { default: html2canvas } = await import("html2canvas-pro");
         const canvas = await html2canvas(container.firstElementChild as HTMLElement, {
           width: template.width,
           height: template.height,
-          scale: 2,
+          scale: 1,
           useCORS: true,
           backgroundColor: null,
         });
