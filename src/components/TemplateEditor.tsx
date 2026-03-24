@@ -67,12 +67,38 @@ export function TemplateEditor({ templateId }: Props) {
     reader.onload = (ev) => {
       const dataUrl = ev.target?.result as string;
       setBgImage(dataUrl);
-      const img = new Image();
-      img.onload = () => {
-        setWidth(img.naturalWidth);
-        setHeight(img.naturalHeight);
-      };
-      img.src = dataUrl;
+
+      if (file.type === "image/svg+xml") {
+        // SVGの場合、テキストからviewBox/width/heightを解析
+        const textReader = new FileReader();
+        textReader.onload = (te) => {
+          const svgText = te.target?.result as string;
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(svgText, "image/svg+xml");
+          const svg = doc.querySelector("svg");
+          if (svg) {
+            const vb = svg.getAttribute("viewBox");
+            const w = svg.getAttribute("width");
+            const h = svg.getAttribute("height");
+            if (w && h) {
+              setWidth(parseInt(w, 10) || 1080);
+              setHeight(parseInt(h, 10) || 210);
+            } else if (vb) {
+              const parts = vb.split(/[\s,]+/);
+              setWidth(parseInt(parts[2], 10) || 1080);
+              setHeight(parseInt(parts[3], 10) || 210);
+            }
+          }
+        };
+        textReader.readAsText(file);
+      } else {
+        const img = new Image();
+        img.onload = () => {
+          setWidth(img.naturalWidth);
+          setHeight(img.naturalHeight);
+        };
+        img.src = dataUrl;
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -204,7 +230,7 @@ export function TemplateEditor({ templateId }: Props) {
                 </label>
                 <input
                   type="file"
-                  accept="image/png,image/jpeg"
+                  accept="image/png,image/jpeg,image/svg+xml"
                   onChange={handleImageUpload}
                   className="text-sm"
                 />
