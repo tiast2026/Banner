@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { GeneratedBanner } from "@/lib/types";
-import { getGeneratedBanners } from "@/lib/storage";
+import {
+  getGeneratedBanners,
+  deleteGeneratedBanner,
+  clearGeneratedBanners,
+} from "@/lib/storage";
 
 export default function HistoryPage() {
   const [banners, setBanners] = useState<GeneratedBanner[]>([]);
@@ -19,13 +23,36 @@ export default function HistoryPage() {
     a.click();
   };
 
+  const handleDelete = (id: string) => {
+    if (!confirm("この履歴を削除しますか？")) return;
+    deleteGeneratedBanner(id);
+    setBanners(getGeneratedBanners());
+  };
+
+  const handleClearAll = () => {
+    if (!confirm("すべての生成履歴を削除しますか？この操作は元に戻せません。"))
+      return;
+    clearGeneratedBanners();
+    setBanners([]);
+  };
+
   return (
     <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold">生成履歴</h2>
-        <p className="text-sm text-gray-400 mt-1">
-          過去に生成したバナーの一覧です（{banners.length}件）
-        </p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-bold">生成履歴</h2>
+          <p className="text-sm text-gray-400 mt-1">
+            過去に生成したバナーの一覧です（{banners.length}件）
+          </p>
+        </div>
+        {banners.length > 0 && (
+          <button
+            onClick={handleClearAll}
+            className="text-red-400 hover:text-red-500 border border-red-200 hover:border-red-300 px-3 py-1.5 rounded-lg text-xs transition-colors"
+          >
+            すべて削除
+          </button>
+        )}
       </div>
 
       {banners.length === 0 ? (
@@ -77,12 +104,20 @@ export default function HistoryPage() {
                       ))}
                   </div>
                 )}
-                <button
-                  onClick={() => handleDownload(b)}
-                  className="text-primary text-sm font-bold hover:underline"
-                >
-                  PNGダウンロード
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleDownload(b)}
+                    className="text-primary text-sm font-bold hover:underline"
+                  >
+                    PNGダウンロード
+                  </button>
+                  <button
+                    onClick={() => handleDelete(b.id)}
+                    className="text-gray-400 hover:text-red-500 text-sm transition-colors ml-auto"
+                  >
+                    削除
+                  </button>
+                </div>
               </div>
             </div>
           ))}
