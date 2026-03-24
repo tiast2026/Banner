@@ -35,6 +35,9 @@ jobs:
         with:
           node-version: 20
           cache: npm
+      - uses: actions/configure-pages@v5
+        with:
+          static_site_generator: next
       - run: npm ci
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
