@@ -63,7 +63,7 @@ export default function TemplatesPage() {
                 </p>
                 <div className="flex gap-2 mt-3">
                   <Link
-                    href={`/templates/${t.id}/edit`}
+                    href={`/templates/edit?id=${t.id}`}
                     className="text-primary text-sm font-bold hover:underline"
                   >
                     編集
