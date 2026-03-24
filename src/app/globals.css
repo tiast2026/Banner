@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2ca6e0;
+  --color-primary-dark: #1e8fc4;
+  --color-danger: #c62828;
+}
+
+body {
+  font-family: "Noto Sans JP", sans-serif;
+}
