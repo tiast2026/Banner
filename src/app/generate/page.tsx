@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Template } from "@/lib/types";
 import { getTemplates, getTemplate, saveGeneratedBanner } from "@/lib/storage";
 import { BannerPreview } from "@/components/BannerPreview";
+import { renderBannerToDataUrl } from "@/lib/renderBanner";
 
 function GeneratePageInner() {
   const searchParams = useSearchParams();
@@ -15,7 +16,6 @@ function GeneratePageInner() {
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
-  const captureRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const all = getTemplates();
@@ -53,37 +53,10 @@ function GeneratePageInner() {
   };
 
   const handleGenerate = useCallback(async () => {
-    if (!captureRef.current || !template) return;
+    if (!template) return;
     setGenerating(true);
     try {
-      // Ensure all font weights are fully loaded before capture
-      await document.fonts.ready;
-      await Promise.all([
-        document.fonts.load("400 16px 'Noto Sans JP'"),
-        document.fonts.load("700 16px 'Noto Sans JP'"),
-        document.fonts.load("900 16px 'Noto Sans JP'"),
-      ]);
-      // Force a repaint to ensure fonts are applied
-      if (captureRef.current) {
-        captureRef.current.style.visibility = "visible";
-        captureRef.current.offsetHeight; // force reflow
-      }
-      await new Promise((r) => setTimeout(r, 200));
-      const { default: html2canvas } = await import("html2canvas-pro");
-      const canvas = await html2canvas(captureRef.current!, {
-        width: template.width,
-        height: template.height,
-        scale: 1,
-        useCORS: true,
-        backgroundColor: null,
-        x: 0,
-        y: 0,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: template.width,
-        windowHeight: template.height,
-      });
-      const dataUrl = canvas.toDataURL("image/png");
+      const dataUrl = await renderBannerToDataUrl(template, values);
       setGeneratedUrl(dataUrl);
       saveGeneratedBanner({
         id: uuidv4(),
@@ -320,22 +293,6 @@ function GeneratePageInner() {
                     </button>
                   </div>
                 )}
-              </div>
-
-              {/* Hidden full-size element for html2canvas capture */}
-              <div
-                style={{
-                  position: "fixed",
-                  left: "-9999px",
-                  top: 0,
-                  pointerEvents: "none",
-                }}
-              >
-                <BannerPreview
-                  ref={captureRef}
-                  template={template}
-                  values={values}
-                />
               </div>
 
               {/* Right: form */}
