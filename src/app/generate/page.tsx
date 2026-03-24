@@ -239,7 +239,7 @@ function GeneratePageInner() {
           </div>
 
           {template && (
-            <div className="grid grid-cols-[1fr,320px] gap-6">
+            <div className="grid grid-cols-[1fr_320px] gap-6">
               {/* Left: preview */}
               <div className="space-y-4">
                 <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -249,23 +249,31 @@ function GeneratePageInner() {
                       {template.width} × {template.height}px
                     </span>
                   </h3>
-                  <div
-                    className="border border-gray-100 rounded overflow-auto bg-gray-50"
-                    style={{ maxWidth: "100%" }}
-                  >
-                    <div
-                      style={{
-                        transform: `scale(${Math.min(1, 700 / template.width)})`,
-                        transformOrigin: "top left",
-                      }}
-                    >
-                      <BannerPreview
-                        ref={previewRef}
-                        template={template}
-                        values={values}
-                      />
-                    </div>
-                  </div>
+                  {(() => {
+                    const scale = Math.min(1, 700 / template.width);
+                    return (
+                      <div
+                        className="border border-gray-100 rounded overflow-hidden bg-gray-50"
+                        style={{
+                          width: template.width * scale,
+                          height: template.height * scale,
+                        }}
+                      >
+                        <div
+                          style={{
+                            transform: `scale(${scale})`,
+                            transformOrigin: "top left",
+                          }}
+                        >
+                          <BannerPreview
+                            ref={previewRef}
+                            template={template}
+                            values={values}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {generatedUrl && (
@@ -279,7 +287,10 @@ function GeneratePageInner() {
                     <img
                       src={generatedUrl}
                       alt="Generated banner"
-                      className="max-w-full border border-gray-200 rounded"
+                      className="border border-gray-200 rounded"
+                      style={{
+                        width: Math.min(700, template.width),
+                      }}
                     />
                     <button
                       onClick={handleDownload}

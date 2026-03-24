@@ -220,7 +220,7 @@ export function TemplateEditor({ templateId }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-[1fr,300px] gap-6">
+      <div className="grid grid-cols-[1fr_300px] gap-6">
         {/* Left: Canvas area */}
         <div>
           {/* Step 1: Basic info */}
