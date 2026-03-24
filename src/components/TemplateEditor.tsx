@@ -69,7 +69,6 @@ export function TemplateEditor({ templateId }: Props) {
       setBgImage(dataUrl);
 
       if (file.type === "image/svg+xml") {
-        // SVGの場合、テキストからviewBox/width/heightを解析
         const textReader = new FileReader();
         textReader.onload = (te) => {
           const svgText = te.target?.result as string;
@@ -114,6 +113,7 @@ export function TemplateEditor({ templateId }: Props) {
       fontWeight: 700,
       fontColor: "#333333",
       textAlign: "left",
+      letterSpacing: 0,
       suffix: "",
       sortOrder: fields.length,
     };
@@ -196,44 +196,72 @@ export function TemplateEditor({ templateId }: Props) {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">
-          {templateId ? "テンプレート編集" : "テンプレート作成"}
-        </h2>
-        <button
-          onClick={handleSave}
-          className="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-primary-dark transition-colors"
-        >
-          保存
-        </button>
+        <div>
+          <h2 className="text-2xl font-bold">
+            {templateId ? "テンプレート編集" : "テンプレート作成"}
+          </h2>
+          <p className="text-sm text-gray-400 mt-1">
+            背景画像にテキストエリアを配置して、バナーの雛形を作成します
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => router.push("/templates")}
+            className="bg-white text-gray-500 border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+          >
+            キャンセル
+          </button>
+          <button
+            onClick={handleSave}
+            className="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-primary-dark transition-colors shadow-sm"
+          >
+            保存
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-[1fr,300px] gap-6">
         {/* Left: Canvas area */}
         <div>
+          {/* Step 1: Basic info */}
           <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+            <div className="text-xs font-bold text-primary mb-3 flex items-center gap-1.5">
+              <span className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px]">
+                1
+              </span>
+              基本情報
+            </div>
             <div className="flex gap-4 mb-4">
               <div className="flex-1">
                 <label className="block text-xs text-gray-500 mb-1">
-                  テンプレート名
+                  テンプレート名 <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="例：カードリーダー"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-colors"
                 />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1">
-                  背景画像
+                  背景画像 <span className="text-red-400">*</span>
                 </label>
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/svg+xml"
-                  onChange={handleImageUpload}
-                  className="text-sm"
-                />
+                <label className="inline-flex items-center gap-1.5 bg-white border border-gray-300 hover:border-primary text-sm text-gray-600 hover:text-primary px-3 py-2 rounded-lg cursor-pointer transition-colors">
+                  {bgImage ? "画像を変更" : "画像を選択"}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/svg+xml"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </label>
+                {bgImage && (
+                  <span className="text-[10px] text-green-500 ml-2">
+                    設定済み
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex gap-4">
@@ -245,7 +273,7 @@ export function TemplateEditor({ templateId }: Props) {
                   type="number"
                   value={width}
                   onChange={(e) => setWidth(Number(e.target.value))}
-                  className="w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-colors"
                 />
               </div>
               <div>
@@ -256,82 +284,109 @@ export function TemplateEditor({ templateId }: Props) {
                   type="number"
                   value={height}
                   onChange={(e) => setHeight(Number(e.target.value))}
-                  className="w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-colors"
                 />
+              </div>
+              <div className="flex items-end">
+                <span className="text-[10px] text-gray-300 pb-2.5">
+                  PNG/JPEG/SVG対応
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Preview canvas */}
+          {/* Step 2: Preview canvas */}
           <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-bold">プレビュー</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-xs font-bold text-primary flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px]">
+                  2
+                </span>
+                テキストエリアを配置
+                <span className="text-[10px] text-gray-400 font-normal ml-2">
+                  ドラッグで位置調整
+                </span>
+              </div>
               <button
                 onClick={addField}
-                className="bg-primary text-white px-3 py-1 rounded text-xs font-bold"
+                className="bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary-dark transition-colors"
               >
                 + テキストエリア追加
               </button>
             </div>
-            <div
-              ref={canvasRef}
-              className="relative border border-gray-300 overflow-hidden select-none"
-              style={{ aspectRatio: `${width}/${height}` }}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-            >
-              {bgImage && (
+            {!bgImage ? (
+              <div className="border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center py-20 text-gray-300">
+                <div className="text-center">
+                  <div className="text-3xl mb-2">🖼</div>
+                  <div className="text-sm">
+                    まず背景画像をアップロードしてください
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div
+                ref={canvasRef}
+                className="relative border border-gray-200 rounded overflow-hidden select-none"
+                style={{ aspectRatio: `${width}/${height}` }}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                onClick={() => setSelectedFieldId(null)}
+              >
                 <img
                   src={bgImage}
                   alt="背景"
                   className="absolute inset-0 w-full h-full object-contain"
                   draggable={false}
                 />
-              )}
-              {fields.map((field) => {
-                const scale = canvasRef.current
-                  ? canvasRef.current.clientWidth / width
-                  : 1;
-                const sampleVal =
-                  field.fieldType === "period"
-                    ? formatFieldValue(
-                        field.fieldType,
-                        "",
-                        field.suffix,
-                        SAMPLE_VALUES
-                      )
-                    : formatFieldValue(
-                        field.fieldType,
-                        getSampleValue(field),
-                        field.suffix
-                      );
-                return (
-                  <div
-                    key={field.id}
-                    onMouseDown={(e) => handleMouseDown(e, field.id)}
-                    onClick={() => setSelectedFieldId(field.id)}
-                    className={`absolute cursor-move whitespace-nowrap ${
-                      selectedFieldId === field.id
-                        ? "outline outline-2 outline-primary outline-offset-2"
-                        : ""
-                    }`}
-                    style={{
-                      left: `${(field.xPosition / width) * 100}%`,
-                      top: `${(field.yPosition / height) * 100}%`,
-                      fontSize: `${field.fontSize * scale}px`,
-                      fontWeight: field.fontWeight,
-                      color: field.fontColor,
-                      textAlign: field.textAlign,
-                      fontFamily: "'Noto Sans JP', sans-serif",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {sampleVal || field.fieldName}
-                  </div>
-                );
-              })}
-            </div>
+                {fields.map((field) => {
+                  const scale = canvasRef.current
+                    ? canvasRef.current.clientWidth / width
+                    : 1;
+                  const sampleVal =
+                    field.fieldType === "period"
+                      ? formatFieldValue(
+                          field.fieldType,
+                          "",
+                          field.suffix,
+                          SAMPLE_VALUES
+                        )
+                      : formatFieldValue(
+                          field.fieldType,
+                          getSampleValue(field),
+                          field.suffix
+                        );
+                  return (
+                    <div
+                      key={field.id}
+                      onMouseDown={(e) => handleMouseDown(e, field.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedFieldId(field.id);
+                      }}
+                      className={`absolute cursor-move whitespace-nowrap ${
+                        selectedFieldId === field.id
+                          ? "outline outline-2 outline-primary outline-offset-2 ring-4 ring-primary/10"
+                          : "hover:outline hover:outline-1 hover:outline-primary/40"
+                      }`}
+                      style={{
+                        left: `${(field.xPosition / width) * 100}%`,
+                        top: `${(field.yPosition / height) * 100}%`,
+                        fontSize: `${field.fontSize * scale}px`,
+                        fontWeight: field.fontWeight,
+                        color: field.fontColor,
+                        textAlign: field.textAlign,
+                        fontFamily: "'Noto Sans JP', sans-serif",
+                        lineHeight: 1,
+                        letterSpacing: `${field.letterSpacing ?? 0}px`,
+                      }}
+                    >
+                      {sampleVal || field.fieldName}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -340,22 +395,31 @@ export function TemplateEditor({ templateId }: Props) {
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <h3 className="font-bold text-sm mb-3">テキストエリア一覧</h3>
             {fields.length === 0 ? (
-              <p className="text-xs text-gray-400">
-                テキストエリアを追加してください
-              </p>
+              <div className="text-center py-4">
+                <p className="text-xs text-gray-400">
+                  「+ テキストエリア追加」で
+                </p>
+                <p className="text-xs text-gray-400">エリアを作成してください</p>
+              </div>
             ) : (
               <ul className="space-y-1">
-                {fields.map((f) => (
+                {fields.map((f, i) => (
                   <li
                     key={f.id}
                     onClick={() => setSelectedFieldId(f.id)}
-                    className={`px-2 py-1 rounded text-sm cursor-pointer ${
+                    className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm cursor-pointer transition-colors ${
                       selectedFieldId === f.id
                         ? "bg-primary/10 text-primary font-bold"
-                        : "hover:bg-gray-100"
+                        : "hover:bg-gray-50 text-gray-600"
                     }`}
                   >
-                    {f.fieldName}
+                    <span className="text-[10px] text-gray-300 w-4 text-right">
+                      {i + 1}
+                    </span>
+                    <span className="truncate">{f.fieldName}</span>
+                    <span className="text-[10px] text-gray-300 ml-auto">
+                      {f.fieldType}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -364,7 +428,12 @@ export function TemplateEditor({ templateId }: Props) {
 
           {selectedField && (
             <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="font-bold text-sm mb-3">プロパティ</h3>
+              <h3 className="font-bold text-sm mb-3">
+                プロパティ
+                <span className="text-xs font-normal text-gray-400 ml-1">
+                  - {selectedField.fieldName}
+                </span>
+              </h3>
               <div className="space-y-3">
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">
@@ -378,7 +447,7 @@ export function TemplateEditor({ templateId }: Props) {
                         fieldName: e.target.value,
                       })
                     }
-                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none"
                   />
                 </div>
                 <div>
@@ -394,12 +463,12 @@ export function TemplateEditor({ templateId }: Props) {
                           e.target.value === "price" ? "円" : selectedField.suffix,
                       })
                     }
-                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none"
                   >
-                    <option value="price">price（価格）</option>
-                    <option value="percent">percent（割引率）</option>
-                    <option value="period">period（期間）</option>
-                    <option value="text">text（テキスト）</option>
+                    <option value="price">価格（¥3,580）</option>
+                    <option value="percent">割引率（20%OFF）</option>
+                    <option value="period">期間（3/4 20:00〜）</option>
+                    <option value="text">テキスト（自由入力）</option>
                   </select>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -415,7 +484,7 @@ export function TemplateEditor({ templateId }: Props) {
                           xPosition: Number(e.target.value),
                         })
                       }
-                      className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                      className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none"
                     />
                   </div>
                   <div>
@@ -430,7 +499,7 @@ export function TemplateEditor({ templateId }: Props) {
                           yPosition: Number(e.target.value),
                         })
                       }
-                      className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                      className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none"
                     />
                   </div>
                 </div>
@@ -446,7 +515,7 @@ export function TemplateEditor({ templateId }: Props) {
                         fontSize: Number(e.target.value),
                       })
                     }
-                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none"
                   />
                 </div>
                 <div>
@@ -460,11 +529,11 @@ export function TemplateEditor({ templateId }: Props) {
                         fontWeight: Number(e.target.value) as 400 | 700 | 900,
                       })
                     }
-                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none"
                   >
-                    <option value={400}>400（通常）</option>
-                    <option value={700}>700（太字）</option>
-                    <option value={900}>900（極太）</option>
+                    <option value={400}>通常 (400)</option>
+                    <option value={700}>太字 (700)</option>
+                    <option value={900}>極太 (900)</option>
                   </select>
                 </div>
                 <div>
@@ -490,7 +559,7 @@ export function TemplateEditor({ templateId }: Props) {
                           fontColor: e.target.value,
                         })
                       }
-                      className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm"
+                      className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none"
                     />
                   </div>
                 </div>
@@ -498,19 +567,42 @@ export function TemplateEditor({ templateId }: Props) {
                   <label className="block text-xs text-gray-500 mb-1">
                     寄せ
                   </label>
-                  <select
-                    value={selectedField.textAlign}
+                  <div className="grid grid-cols-3 gap-1">
+                    {(["left", "center", "right"] as const).map((align) => (
+                      <button
+                        key={align}
+                        onClick={() =>
+                          updateField(selectedField.id, { textAlign: align })
+                        }
+                        className={`py-1 rounded text-xs transition-colors ${
+                          selectedField.textAlign === align
+                            ? "bg-primary text-white font-bold"
+                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                        }`}
+                      >
+                        {align === "left" ? "左" : align === "center" ? "中央" : "右"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">
+                    文字間隔 (px)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={selectedField.letterSpacing ?? 0}
                     onChange={(e) =>
                       updateField(selectedField.id, {
-                        textAlign: e.target.value as "left" | "center" | "right",
+                        letterSpacing: Number(e.target.value),
                       })
                     }
-                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-                  >
-                    <option value="left">左寄せ</option>
-                    <option value="center">中央</option>
-                    <option value="right">右寄せ</option>
-                  </select>
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none"
+                  />
+                  <span className="text-[10px] text-gray-300">
+                    マイナス値で詰め、プラス値で広げる
+                  </span>
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">
@@ -525,12 +617,12 @@ export function TemplateEditor({ templateId }: Props) {
                       })
                     }
                     placeholder="例：円"
-                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none"
                   />
                 </div>
                 <button
                   onClick={() => removeField(selectedField.id)}
-                  className="w-full text-red-500 border border-red-300 rounded px-2 py-1 text-sm hover:bg-red-50"
+                  className="w-full text-red-400 border border-red-200 rounded-lg px-2 py-1.5 text-xs hover:bg-red-50 hover:text-red-500 transition-colors"
                 >
                   このエリアを削除
                 </button>

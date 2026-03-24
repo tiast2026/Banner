@@ -98,39 +98,47 @@ function GeneratePageInner() {
           </label>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs text-gray-400">開始日</label>
+              <label className="block text-[10px] text-gray-400 mb-0.5">
+                開始日
+              </label>
               <input
                 type="date"
                 value={values["startDate"] || ""}
                 onChange={(e) => handleValueChange("startDate", e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:border-primary outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400">開始時間</label>
+              <label className="block text-[10px] text-gray-400 mb-0.5">
+                開始時間
+              </label>
               <input
                 type="time"
                 value={values["startTime"] || ""}
                 onChange={(e) => handleValueChange("startTime", e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:border-primary outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400">終了日</label>
+              <label className="block text-[10px] text-gray-400 mb-0.5">
+                終了日
+              </label>
               <input
                 type="date"
                 value={values["endDate"] || ""}
                 onChange={(e) => handleValueChange("endDate", e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:border-primary outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400">終了時間</label>
+              <label className="block text-[10px] text-gray-400 mb-0.5">
+                終了時間
+              </label>
               <input
                 type="time"
                 value={values["endTime"] || ""}
                 onChange={(e) => handleValueChange("endTime", e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:border-primary outline-none"
               />
             </div>
           </div>
@@ -147,15 +155,23 @@ function GeneratePageInner() {
       <div key={field.id}>
         <label className="block text-xs text-gray-500 font-bold mb-1">
           {field.fieldName}
-          {field.fieldType === "price" && "（数値）"}
-          {field.fieldType === "percent" && "（%）"}
+          {field.fieldType === "price" && (
+            <span className="font-normal text-gray-400 ml-1">数値</span>
+          )}
+          {field.fieldType === "percent" && (
+            <span className="font-normal text-gray-400 ml-1">%</span>
+          )}
         </label>
         {isAutoCalc ? (
-          <div className="border border-gray-200 bg-gray-50 rounded px-2 py-1 text-sm text-gray-600">
-            {values["割引後価格"]
-              ? Number(values["割引後価格"]).toLocaleString() + "円"
-              : "自動計算"}
-            <span className="text-xs text-gray-400 ml-2">（自動計算）</span>
+          <div className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-sm text-gray-600 flex items-center justify-between">
+            <span>
+              {values["割引後価格"]
+                ? Number(values["割引後価格"]).toLocaleString() + "円"
+                : "---"}
+            </span>
+            <span className="text-[10px] text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded">
+              自動計算
+            </span>
           </div>
         ) : (
           <input
@@ -166,7 +182,7 @@ function GeneratePageInner() {
             }
             value={values[field.fieldName] || ""}
             onChange={(e) => handleValueChange(field.fieldName, e.target.value)}
-            className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-colors"
             placeholder={
               field.fieldType === "price"
                 ? "例：3580"
@@ -182,18 +198,27 @@ function GeneratePageInner() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">バナー生成</h2>
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold">バナー生成</h2>
+        <p className="text-sm text-gray-400 mt-1">
+          テンプレートを選び、値を入力してバナーを生成します
+        </p>
+      </div>
 
       {templates.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <p className="text-gray-500">
-            テンプレートがありません。先にテンプレートを作成してください。
+        <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
+          <div className="text-4xl mb-4">🖼</div>
+          <p className="text-gray-600 font-bold mb-2">
+            テンプレートがありません
+          </p>
+          <p className="text-sm text-gray-400">
+            先にテンプレートを作成してください
           </p>
         </div>
       ) : (
         <>
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-1">
+            <label className="block text-xs text-gray-500 font-bold mb-1.5">
               テンプレート選択
             </label>
             <select
@@ -203,7 +228,7 @@ function GeneratePageInner() {
                 setValues({});
                 setGeneratedUrl(null);
               }}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm min-w-[280px] focus:border-primary outline-none"
             >
               {templates.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -218,11 +243,14 @@ function GeneratePageInner() {
               {/* Left: preview */}
               <div className="space-y-4">
                 <div className="bg-white rounded-xl border border-gray-200 p-4">
-                  <h3 className="text-sm font-bold mb-2">
+                  <h3 className="text-xs font-bold text-gray-500 mb-3">
                     リアルタイムプレビュー
+                    <span className="text-[10px] text-gray-300 font-normal ml-2">
+                      {template.width} × {template.height}px
+                    </span>
                   </h3>
                   <div
-                    className="border border-gray-200 overflow-auto"
+                    className="border border-gray-100 rounded overflow-auto bg-gray-50"
                     style={{ maxWidth: "100%" }}
                   >
                     <div
@@ -241,18 +269,23 @@ function GeneratePageInner() {
                 </div>
 
                 {generatedUrl && (
-                  <div className="bg-white rounded-xl border border-gray-200 p-4">
-                    <h3 className="text-sm font-bold mb-2">生成結果</h3>
+                  <div className="bg-white rounded-xl border border-green-200 p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-green-400" />
+                      <h3 className="text-xs font-bold text-green-700">
+                        生成完了
+                      </h3>
+                    </div>
                     <img
                       src={generatedUrl}
                       alt="Generated banner"
-                      className="max-w-full border border-gray-200"
+                      className="max-w-full border border-gray-200 rounded"
                     />
                     <button
                       onClick={handleDownload}
-                      className="mt-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold"
+                      className="mt-3 bg-primary text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-primary-dark transition-colors"
                     >
-                      ダウンロード
+                      PNGダウンロード
                     </button>
                   </div>
                 )}
@@ -260,25 +293,30 @@ function GeneratePageInner() {
 
               {/* Right: form */}
               <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="text-sm font-bold mb-3">入力項目</h3>
+                <h3 className="text-xs font-bold text-gray-500 mb-1">
+                  入力項目
+                </h3>
+                <p className="text-[10px] text-gray-300 mb-4">
+                  各項目に値を入力すると左のプレビューに即反映されます
+                </p>
                 <div className="space-y-4">
                   {template.fields
                     .slice()
                     .sort((a, b) => a.sortOrder - b.sortOrder)
                     .map(renderInputField)}
                 </div>
-                <div className="mt-6 flex gap-2">
+                <div className="mt-6 pt-4 border-t border-gray-100 flex gap-2">
                   <button
                     onClick={handleGenerate}
                     disabled={generating}
-                    className="flex-1 bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary-dark transition-colors disabled:opacity-50"
+                    className="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-primary-dark transition-colors disabled:opacity-50"
                   >
-                    {generating ? "生成中..." : "生成"}
+                    {generating ? "生成中..." : "バナーを生成"}
                   </button>
                   {generatedUrl && (
                     <button
                       onClick={handleDownload}
-                      className="bg-white text-primary border border-primary px-4 py-2 rounded-lg text-sm font-bold"
+                      className="bg-white text-primary border border-primary px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-primary/5 transition-colors"
                     >
                       DL
                     </button>

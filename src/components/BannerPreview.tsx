@@ -57,6 +57,7 @@ export const BannerPreview = forwardRef<HTMLDivElement, Props>(
                 textAlign: field.textAlign,
                 whiteSpace: "nowrap",
                 lineHeight: 1,
+                letterSpacing: `${field.letterSpacing ?? 0}px`,
                 fontFamily: "'Noto Sans JP', sans-serif",
               }}
             >

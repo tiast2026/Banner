@@ -8,6 +8,7 @@ export interface TemplateField {
   fontWeight: 400 | 700 | 900;
   fontColor: string;
   textAlign: "left" | "center" | "right";
+  letterSpacing: number;
   suffix: string;
   sortOrder: number;
 }
