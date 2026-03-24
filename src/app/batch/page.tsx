@@ -158,6 +158,12 @@ export default function BatchPage() {
           scale: 1,
           useCORS: true,
           backgroundColor: null,
+          x: 0,
+          y: 0,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: template.width,
+          windowHeight: template.height,
         });
 
         const dataUrl = canvas.toDataURL("image/png");
