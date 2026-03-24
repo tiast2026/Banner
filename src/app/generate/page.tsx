@@ -15,6 +15,7 @@ function GeneratePageInner() {
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
+  const captureRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const all = getTemplates();
@@ -52,11 +53,12 @@ function GeneratePageInner() {
   };
 
   const handleGenerate = useCallback(async () => {
-    if (!previewRef.current || !template) return;
+    if (!captureRef.current || !template) return;
     setGenerating(true);
     try {
+      await document.fonts.ready;
       const { default: html2canvas } = await import("html2canvas-pro");
-      const canvas = await html2canvas(previewRef.current, {
+      const canvas = await html2canvas(captureRef.current!, {
         width: template.width,
         height: template.height,
         scale: 2,
@@ -300,6 +302,23 @@ function GeneratePageInner() {
                     </button>
                   </div>
                 )}
+              </div>
+
+              {/* Hidden full-size element for html2canvas capture */}
+              <div
+                style={{
+                  position: "fixed",
+                  left: "-9999px",
+                  top: 0,
+                  pointerEvents: "none",
+                  opacity: 0,
+                }}
+              >
+                <BannerPreview
+                  ref={captureRef}
+                  template={template}
+                  values={values}
+                />
               </div>
 
               {/* Right: form */}
