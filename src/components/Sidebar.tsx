@@ -7,7 +7,9 @@ const navItems = [
   { href: "/", label: "ダッシュボード", icon: "🏠", desc: "概要を確認" },
   { href: "/templates", label: "テンプレート", icon: "📐", desc: "テンプレート管理" },
   { href: "/generate", label: "バナー生成", icon: "🖼", desc: "バナーを作成" },
+  { href: "/batch", label: "一括生成", icon: "📊", desc: "シートから一括生成" },
   { href: "/history", label: "生成履歴", icon: "📋", desc: "過去の生成結果" },
+  { href: "/settings", label: "シート連携", icon: "⚙️", desc: "スプレッドシート設定" },
 ];
 
 export function Sidebar() {

@@ -1,4 +1,4 @@
-import { Template, GeneratedBanner, Preset } from "./types";
+import { Template, GeneratedBanner, Preset, SheetConfig } from "./types";
 
 const TEMPLATES_KEY = "banner_templates";
 const BANNERS_KEY = "banner_generated";
@@ -81,4 +81,31 @@ export function savePreset(preset: Preset): void {
 export function deletePreset(id: string): void {
   const presets = getItem<Preset>(PRESETS_KEY).filter((p) => p.id !== id);
   setItem(PRESETS_KEY, presets);
+}
+
+// Sheet configs
+const SHEET_CONFIGS_KEY = "banner_sheet_configs";
+
+export function getSheetConfigs(): SheetConfig[] {
+  return getItem<SheetConfig>(SHEET_CONFIGS_KEY);
+}
+
+export function getSheetConfig(templateId: string): SheetConfig | undefined {
+  return getSheetConfigs().find((c) => c.templateId === templateId);
+}
+
+export function saveSheetConfig(config: SheetConfig): void {
+  const configs = getSheetConfigs();
+  const idx = configs.findIndex((c) => c.id === config.id);
+  if (idx >= 0) {
+    configs[idx] = config;
+  } else {
+    configs.push(config);
+  }
+  setItem(SHEET_CONFIGS_KEY, configs);
+}
+
+export function deleteSheetConfig(id: string): void {
+  const configs = getSheetConfigs().filter((c) => c.id !== id);
+  setItem(SHEET_CONFIGS_KEY, configs);
 }

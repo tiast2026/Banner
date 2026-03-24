@@ -39,3 +39,14 @@ export interface Preset {
   name: string;
   parameters: Record<string, string>;
 }
+
+export interface SheetConfig {
+  id: string;
+  templateId: string;
+  templateName: string;
+  spreadsheetUrl: string;
+  sheetName: string;
+  fieldMapping: Record<string, string>; // templateFieldName -> sheetColumnName
+  createdAt: string;
+  updatedAt: string;
+}
