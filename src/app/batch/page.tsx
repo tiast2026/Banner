@@ -13,6 +13,7 @@ import {
 } from "@/lib/storage";
 import { fetchSheetData } from "@/lib/sheets";
 import { BannerPreview } from "@/components/BannerPreview";
+import { renderBannerToDataUrl } from "@/lib/renderBanner";
 
 export default function BatchPage() {
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -121,52 +122,8 @@ export default function BatchPage() {
       const values = rows[rowIndex];
       setProgress({ current: i + 1, total: selected.length });
 
-      // Render banner off-screen
-      const container = document.createElement("div");
-      container.style.position = "fixed";
-      container.style.left = "-9999px";
-      container.style.top = "0";
-      container.style.pointerEvents = "none";
-      document.body.appendChild(container);
-
-      // Create React root and render
-      const { createRoot } = await import("react-dom/client");
-      const root = createRoot(container);
-
-      await new Promise<void>((resolve) => {
-        root.render(
-          <BannerPreview template={template} values={values} />
-        );
-        // Wait for render + image/font load
-        setTimeout(resolve, 500);
-      });
-
-      // Ensure fonts are loaded
-      await document.fonts.ready;
-      await Promise.all([
-        document.fonts.load("400 16px 'Noto Sans JP'"),
-        document.fonts.load("700 16px 'Noto Sans JP'"),
-        document.fonts.load("900 16px 'Noto Sans JP'"),
-      ]);
-      await new Promise((r) => setTimeout(r, 200));
-
       try {
-        const { default: html2canvas } = await import("html2canvas-pro");
-        const canvas = await html2canvas(container.firstElementChild as HTMLElement, {
-          width: template.width,
-          height: template.height,
-          scale: 1,
-          useCORS: true,
-          backgroundColor: null,
-          x: 0,
-          y: 0,
-          scrollX: 0,
-          scrollY: 0,
-          windowWidth: template.width,
-          windowHeight: template.height,
-        });
-
-        const dataUrl = canvas.toDataURL("image/png");
+        const dataUrl = await renderBannerToDataUrl(template, values);
 
         // Save to history
         saveGeneratedBanner({
@@ -186,9 +143,6 @@ export default function BatchPage() {
         zip.file(`${safeName}_${rowIndex + 1}.png`, base64, { base64: true });
       } catch (err) {
         console.error(`Row ${rowIndex + 1} generation failed:`, err);
-      } finally {
-        root.unmount();
-        document.body.removeChild(container);
       }
     }
 
